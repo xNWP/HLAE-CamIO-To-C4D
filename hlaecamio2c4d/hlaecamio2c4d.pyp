@@ -59,7 +59,6 @@ from c4d import gui
 from c4d.storage import LoadDialog
 
 import math
-import webbrowser
 
 # Global Vars
 PLUGIN_VERSION = "v1.0"
@@ -486,7 +485,7 @@ def main():
 	plugins.RegisterCommandPlugin(PLUGIN_ID, PLUGIN_NAME, 0, icon, PLUGIN_DESCRIPTION, HLAECamio2C4d())
 	
 	# Console confirmation
-	print "Loaded HLAE CamIO 2 Cinema4D %s" % (PLUGIN_VERSION)
+	print "Loaded %s" % (PLUGIN_NAME)
 
 # Main Execution
 main()
