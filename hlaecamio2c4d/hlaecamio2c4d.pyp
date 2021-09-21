@@ -62,8 +62,8 @@ import math
 import webbrowser
 
 # Global Vars
-PLUGIN_VERSION = "v1.2"
-PLUGIN_VERSION_FLOAT = 1.2
+PLUGIN_VERSION = "v1.3"
+PLUGIN_VERSION_FLOAT = 1.3
 PLUGIN_NAME = "HLAE CamIO 2 Cinema4D " + PLUGIN_VERSION
 PLUGIN_DESCRIPTION = "Converts HLAE CamIO to Cinema4D Camera Data."
 PLUGIN_ID = 1039640 # Registered ID
@@ -76,7 +76,7 @@ RECORDING_HEIGHT = 0
 def DoWork(file, ForMap):
 
 	c4d.StatusSetSpin()
-	CamIOFile = open(file.decode("utf-8"))
+	CamIOFile = open(file)
 	
 	# load in our headers and test them
 	header = CamIOFile.readline()
