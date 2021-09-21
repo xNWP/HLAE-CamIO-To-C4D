@@ -59,15 +59,16 @@ from c4d import gui
 from c4d.storage import LoadDialog
 
 import math
+import webbrowser
 
 # Global Vars
-PLUGIN_VERSION = "v1.0"
-PLUGIN_VERSION_FLOAT = 1.0
+PLUGIN_VERSION = "v1.3"
+PLUGIN_VERSION_FLOAT = 1.3
 PLUGIN_NAME = "HLAE CamIO 2 Cinema4D " + PLUGIN_VERSION
 PLUGIN_DESCRIPTION = "Converts HLAE CamIO to Cinema4D Camera Data."
 PLUGIN_ID = 1039640 # Registered ID
 PLUGIN_WEBPAGE = "http://github.com/xNWP"
-HLAECAM_VERSION = 1
+HLAECAM_VERSION = 2
 RECORDING_WIDTH = 0
 RECORDING_HEIGHT = 0
 
@@ -75,7 +76,7 @@ RECORDING_HEIGHT = 0
 def DoWork(file, ForMap):
 
 	c4d.StatusSetSpin()
-	CamIOFile = open(file.decode("utf-8"))
+	CamIOFile = open(file)
 	
 	# load in our headers and test them
 	header = CamIOFile.readline()
@@ -90,6 +91,12 @@ def DoWork(file, ForMap):
 		gui.MessageDialog("HLAE CamIO version not supported by this plugin, check releases for a new version that does.")
 		return False
 	
+	if(header[8:] == "2\n"):
+		CamIOFile.readline() # skip useless lines
+	else:
+		CamIOFile.readline() # skip useless lines
+		CamIOFile.readline() # skip useless lines
+		
 	c4d.StopAllThreads()
 	
 	header = CamIOFile.readline()
@@ -102,7 +109,7 @@ def DoWork(file, ForMap):
 		RECORDING_WIDTH = 0
 		RECORDING_HEIGHT = 0
 		
-		print "%s: CS:GO Scaling Detected, requesting recording resolution from user." % (PLUGIN_NAME)
+		print ("%s: CS:GO Scaling Detected, requesting recording resolution from user." % (PLUGIN_NAME))
 		GetRes = GetResolution()
 		GetRes.Open(c4d.DLG_TYPE_MODAL, PLUGIN_ID, -1, -1, 350, 205, 1)
 		
@@ -114,12 +121,11 @@ def DoWork(file, ForMap):
 		ScaleFov = True
 	
 	if (ForMap == True):
-		print "%s: Importing for map." % (PLUGIN_NAME)
+		print ("%s: Importing for map." % (PLUGIN_NAME))
 	
 	c4d.StatusSetSpin()
 	
-	CamIOFile.readline() # skip useless lines
-	CamIOFile.readline()
+	
 	
 	# read all our data into an 8d vector
 	RawData = []
@@ -135,7 +141,7 @@ def DoWork(file, ForMap):
 			lastFrameTime = RawData[len(RawData) - 2][0]
 			currentFrameTime = RawData[len(RawData) - 1][0]
 			if (float(currentFrameTime) == float(lastFrameTime)):
-				print "%s: ERROR: Non-Changing Time between frames %s and %s." % (PLUGIN_NAME, len(RawData) - 2, len(RawData) - 1)
+				print ("%s: ERROR: Non-Changing Time between frames %s and %s." % (PLUGIN_NAME, len(RawData) - 2, len(RawData) - 1))
 				gui.MessageDialog("File has duplicate times (make sure you don't pause while recording).")
 				return False
 	
@@ -145,13 +151,13 @@ def DoWork(file, ForMap):
 	
 	CurrentProj.StartUndo()
 	
-	print "%s: Setting Framerate to %s (r/f %s)" % (PLUGIN_NAME, round(framerate, 0), framerate)	
+	print ("%s: Setting Framerate to %s (r/f %s)" % (PLUGIN_NAME, round(framerate, 0), framerate))	
 	CurrentProj.SetFps(int(round(framerate, 0))) # set the fps to match our data, we'll round to the nearest full value
 												 # this doesn't account for people recording at weird framerates (such as 29.97)
 												 # but this should be a slim margin of people, they may override the fps manually if they choose
 	
 	C4DProjLength = c4d.BaseTime(len(RawData) - 1,CurrentProj.GetFps()) # c4d is zero indexed, 0 -> n - 1
-	print "%s: Setting Number of Frames to %s (%s s)." % (PLUGIN_NAME, (C4DProjLength.GetFrame(CurrentProj.GetFps()) + 1), (C4DProjLength.Get() + (1.0/CurrentProj.GetFps())))
+	print ("%s: Setting Number of Frames to %s (%s s)." % (PLUGIN_NAME, (C4DProjLength.GetFrame(CurrentProj.GetFps()) + 1), (C4DProjLength.Get() + (1.0/CurrentProj.GetFps()))))
 	CurrentProj.SetMaxTime(C4DProjLength) # set the project length accordingly.
 	CurrentProj.SetLoopMaxTime(C4DProjLength) # set the preview time as well
 	
@@ -161,7 +167,7 @@ def DoWork(file, ForMap):
 		CurrentRenderSettings[c4d.RDATA_XRES] = RECORDING_WIDTH
 		CurrentRenderSettings[c4d.RDATA_YRES] = RECORDING_HEIGHT
 		c4d.EventAdd()
-		print "%s: Set resolution (w: %s, h: %s)." % (PLUGIN_NAME, RECORDING_WIDTH, RECORDING_HEIGHT)
+		print ("%s: Set resolution (w: %s, h: %s)." % (PLUGIN_NAME, RECORDING_WIDTH, RECORDING_HEIGHT))
 		
 	# Create our camera
 	Camera = c4d.BaseObject(c4d.Ocamera)
@@ -292,7 +298,7 @@ def DoWork(file, ForMap):
 	
 	CurrentProj.EndUndo()
 	
-	print "%s: Import Completed." % (PLUGIN_NAME)
+	print ("%s: Import Completed." % (PLUGIN_NAME))
 	gui.MessageDialog("Successfully imported %s frames." % (len(RawData)))
 	c4d.DrawViews(c4d.DRAWFLAGS_FORCEFULLREDRAW)
 	
@@ -381,7 +387,7 @@ class PrimaryUI(gui.GeDialog):
 			
 			if(CamIOFile != None): # user didn't cancel the browse
 				self.SetString(251, CamIOFile)
-				print "%s: File to load set as '%s'" % (PLUGIN_NAME, CamIOFile)
+				print ("%s: File to load set as '%s'" % (PLUGIN_NAME, CamIOFile))
 		
 			return True
 			
@@ -452,7 +458,7 @@ class GetResolution(gui.GeDialog):
 				RECORDING_WIDTH = tmp_w
 				RECORDING_HEIGHT = tmp_h
 				
-				print "%s: Using width: %s, height: %s." % (PLUGIN_NAME, str(RECORDING_WIDTH), str(RECORDING_HEIGHT))
+				print ("%s: Using width: %s, height: %s." % (PLUGIN_NAME, str(RECORDING_WIDTH), str(RECORDING_HEIGHT)))
 			
 			except:
 				gui.MessageDialog("Width and height must both be positive integers.")
@@ -485,7 +491,7 @@ def main():
 	plugins.RegisterCommandPlugin(PLUGIN_ID, PLUGIN_NAME, 0, icon, PLUGIN_DESCRIPTION, HLAECamio2C4d())
 	
 	# Console confirmation
-	print "Loaded %s" % (PLUGIN_NAME)
+	print ("Loaded HLAE CamIO 2 Cinema4D %s" % (PLUGIN_VERSION))
 
 # Main Execution
 main()
