@@ -62,8 +62,8 @@ import math
 import webbrowser
 
 # Global Vars
-PLUGIN_VERSION = "v1.2"
-PLUGIN_VERSION_FLOAT = 1.2
+PLUGIN_VERSION = "v1.0"
+PLUGIN_VERSION_FLOAT = 1.0
 PLUGIN_NAME = "HLAE CamIO 2 Cinema4D " + PLUGIN_VERSION
 PLUGIN_DESCRIPTION = "Converts HLAE CamIO to Cinema4D Camera Data."
 PLUGIN_ID = 1039640 # Registered ID
@@ -91,6 +91,12 @@ def DoWork(file, ForMap):
 		gui.MessageDialog("HLAE CamIO version not supported by this plugin, check releases for a new version that does.")
 		return False
 	
+	if(header[8:] == "2\n"):
+		CamIOFile.readline() # skip useless lines
+	else:
+		CamIOFile.readline() # skip useless lines
+		CamIOFile.readline() # skip useless lines
+		
 	c4d.StopAllThreads()
 	
 	header = CamIOFile.readline()
@@ -119,7 +125,7 @@ def DoWork(file, ForMap):
 	
 	c4d.StatusSetSpin()
 	
-	CamIOFile.readline() # skip useless lines
+	
 	
 	# read all our data into an 8d vector
 	RawData = []
