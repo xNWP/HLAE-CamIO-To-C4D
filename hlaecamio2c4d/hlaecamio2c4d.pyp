@@ -62,8 +62,8 @@ import math
 import webbrowser
 
 # Global Vars
-PLUGIN_VERSION = "v1.0"
-PLUGIN_VERSION_FLOAT = 1.0
+PLUGIN_VERSION = "v1.2"
+PLUGIN_VERSION_FLOAT = 1.2
 PLUGIN_NAME = "HLAE CamIO 2 Cinema4D " + PLUGIN_VERSION
 PLUGIN_DESCRIPTION = "Converts HLAE CamIO to Cinema4D Camera Data."
 PLUGIN_ID = 1039640 # Registered ID
