@@ -62,9 +62,10 @@ import math
 import webbrowser
 
 # Global Vars
-PLUGIN_VERSION = "v1.3"
-PLUGIN_VERSION_FLOAT = 1.3
-PLUGIN_NAME = "HLAE CamIO 2 Cinema4D " + PLUGIN_VERSION
+PLUGIN_VERSION_MAJOR = 2
+PLUGIN_VERSION_MINOR = 0
+PLUGIN_VERSION_STR = "v{}.{}".format(PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR)
+PLUGIN_NAME = "HLAE CamIO 2 Cinema4D " + PLUGIN_VERSION_STR
 PLUGIN_DESCRIPTION = "Converts HLAE CamIO to Cinema4D Camera Data."
 PLUGIN_ID = 1039640 # Registered ID
 PLUGIN_WEBPAGE = "http://github.com/xNWP"
@@ -74,58 +75,60 @@ RECORDING_HEIGHT = 0
 
 # Process Data
 def DoWork(file, ForMap):
-
-	c4d.StatusSetSpin()
 	CamIOFile = open(file)
 	
-	# load in our headers and test them
+	# default values
+	ScaleFov = True
+	FileVersion = -1
+
 	header = CamIOFile.readline()
 	
 	if(header != "advancedfx Cam\n"):
 		gui.MessageDialog("Not a valid HLAE CamIO File.")
 		return False
-	
-	header = CamIOFile.readline()
-	
-	if(float(header[8:]) > HLAECAM_VERSION):
-		gui.MessageDialog("HLAE CamIO version not supported by this plugin, check releases for a new version that does.")
+
+	line = CamIOFile.readline()
+	while line != "DATA\n":
+		lineVec = line.split()
+		line = CamIOFile.readline()
+		if len(lineVec) == 0:
+			continue
+
+		# version
+		if lineVec[0] == "version":
+			FileVersion = int(lineVec[1])
+			if (FileVersion > HLAECAM_VERSION):
+				gui.MessageDialog("HLAE CamIO version not supported by this plugin, check releases for a new version that does.")
+				return False
+			continue
+
+		# scale
+		if lineVec[0] == "scaleFov":
+			if(lineVec[1] == "none"):
+				ScaleFov = False
+
+				global RECORDING_WIDTH
+				global RECORDING_HEIGHT
+				RECORDING_WIDTH = 0
+				RECORDING_HEIGHT = 0
+
+				print ("%s: CS:GO Scaling Detected, requesting recording resolution from user." % (PLUGIN_NAME))
+				GetRes = GetResolution()
+				GetRes.Open(c4d.DLG_TYPE_MODAL, PLUGIN_ID, -1, -1, 350, 205, 1)
+
+				if(not RECORDING_WIDTH == 0 or not RECORDING_HEIGHT == 0): # catch non set res
+					RelatedRatio = (float(RECORDING_WIDTH)/RECORDING_HEIGHT)/(4.0/3.0)
+				else:
+					return False
+
+	# catch no version
+	if FileVersion < 0:
+		gui.MessageDialog("Invalid CamIO file.")
 		return False
-	
-	if(header[8:] == "2\n"):
-		CamIOFile.readline() # skip useless lines
-	else:
-		CamIOFile.readline() # skip useless lines
-		CamIOFile.readline() # skip useless lines
 		
-	c4d.StopAllThreads()
-	
-	header = CamIOFile.readline()
-	
-	if(header[9:] == "none\n"):
-		ScaleFov = False
-		
-		global RECORDING_WIDTH
-		global RECORDING_HEIGHT
-		RECORDING_WIDTH = 0
-		RECORDING_HEIGHT = 0
-		
-		print ("%s: CS:GO Scaling Detected, requesting recording resolution from user." % (PLUGIN_NAME))
-		GetRes = GetResolution()
-		GetRes.Open(c4d.DLG_TYPE_MODAL, PLUGIN_ID, -1, -1, 350, 205, 1)
-		
-		if(not RECORDING_WIDTH == 0 or not RECORDING_HEIGHT == 0): # catch non set res
-			RelatedRatio = (float(RECORDING_WIDTH)/RECORDING_HEIGHT)/(4.0/3.0)
-		else:
-			return False
-	else:
-		ScaleFov = True
-	
+	c4d.StopAllThreads()	
 	if (ForMap == True):
 		print ("%s: Importing for map." % (PLUGIN_NAME))
-	
-	c4d.StatusSetSpin()
-	
-	
 	
 	# read all our data into an 8d vector
 	RawData = []
@@ -293,7 +296,6 @@ def DoWork(file, ForMap):
 		
 		i = i + 1
 	
-	c4d.StatusClear()
 	c4d.EventAdd()
 	
 	CurrentProj.EndUndo()
@@ -402,7 +404,9 @@ class PrimaryUI(gui.GeDialog):
 				gui.MessageDialog("Please first specify a CamIO File to import.")
 				return False
 			else:
+				c4d.StatusSetSpin()
 				ImportCam = DoWork(self.GetString(251), self.GetBool(253)) # Pass the file to the main proccessing function
+				c4d.StatusClear()
 				if ImportCam:
 					self.Close()
 			return True
