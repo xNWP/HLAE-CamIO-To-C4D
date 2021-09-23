@@ -1,15 +1,15 @@
 == INSTALLATION ==
 
-To install - simply copy the folder 'hlaecamio2c4d' to the Cinema4D Plugins folder,
-usually located at: C:\Program Files\MAXON\CINEMA 4D R17\plugins
+To install - simply copy the folder 'hlaecamio2c4d' to the Cinema4D Plugins folder, usually located at:
+    C:\Program Files\MAXON\CINEMA 4D <version>\plugins
 
 == USAGE ==
 
 Open the plugin under the plugins menu, select the CamIO file and click import.
-If the plugin was recorded with fovScaling at none, you will be required to specify
+If the plugin was recorded with fovScaling at none (version 1 CamIO files only), you will be required to specify
 the recording resolution (the plugin will automatically set your project settings to this as well).
 
-If you want to import the camera to line up with csgo maps exported to c4d use "Import for map usage".
+If you want to import the camera to line up with csgo maps exported to c4d use "Import for map usage". (for certain workflows)
 
 To map a coordinate received from the game via getpos or mirv_input position, use the following mappings:
 
@@ -26,12 +26,3 @@ To map a coordinate received from the game via getpos or mirv_input position, us
 	
 GL and HF !
 - Brett "xNWP" Anthony
-
-
-
-
-
-
-Like the script?
-Send me some stuff to play/use/sell for coffee money :-)
-https://steamcommunity.com/tradeoffer/new/?partner=37630060&token=pGfgBYGY

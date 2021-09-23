@@ -1,16 +1,17 @@
-ECHO OFF
-CLS
-
+@ECHO OFF
+ECHO Deleting existing archives...
 DEL /P *.7z *.zip
-CLS
+ECHO Done.
 
-SET "sevzip="C:\Program Files\7-Zip\7z.exe""
-SET "version=v1"
-SET "filelist=hlaecamio2c4d INSTALLATION.txt"
+SET sevzip="C:\Program Files\7-Zip\7z.exe"
+SET filelist=hlaecamio2c4d INSTALLATION.txt
 
-%sevzip% a -t7z HLAE_CAMIO_2_C4D_Cam_%version%.7z %filelist%
-%sevzip% a -tzip HLAE_CAMIO_2_C4D_Cam_%version%.zip %filelist%
+SET /P versionMajor="Major Version: "
+SET /P versionMinor="Minor Version: "
+SET archName="HLAE-CamIO-To-C4D_%versionMajor%_%versionMinor%"
+
+%sevzip% a -t7z %archName%.7z %filelist%
+%sevzip% a -tzip %archName%.zip %filelist%
 
 ECHO.
 ECHO Packaged.
-PAUSE > nul
