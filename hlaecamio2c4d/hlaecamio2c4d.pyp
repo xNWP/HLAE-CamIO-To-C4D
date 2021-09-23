@@ -63,7 +63,7 @@ import webbrowser
 
 # Global Vars
 PLUGIN_VERSION_MAJOR = 2
-PLUGIN_VERSION_MINOR = 0
+PLUGIN_VERSION_MINOR = 1
 PLUGIN_VERSION_STR = "v{}.{}".format(PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR)
 PLUGIN_NAME = "HLAE CamIO 2 Cinema4D " + PLUGIN_VERSION_STR
 PLUGIN_DESCRIPTION = "Converts HLAE CamIO to Cinema4D Camera Data."
@@ -341,7 +341,7 @@ class PrimaryUI(gui.GeDialog):
 		
 		self.GroupBegin(100, c4d.BFH_SCALE, 1, 5) # PROGRAM INFO GROUP
 		
-		self.AddStaticText(101, c4d.BFH_RIGHT, 0, 0, PLUGIN_VERSION)
+		self.AddStaticText(101, c4d.BFH_RIGHT, 0, 0, PLUGIN_VERSION_STR)
 		self.AddStaticText(102, c4d.BFH_CENTER, 0, 0, PLUGIN_DESCRIPTION)
 		self.AddStaticText(103, c4d.BFH_CENTER, 0, 0, "Plugin by xNWP")
 		self.AddStaticText(104, c4d.BFH_CENTER, 0, 0, PLUGIN_WEBPAGE)
@@ -495,7 +495,7 @@ def main():
 	plugins.RegisterCommandPlugin(PLUGIN_ID, PLUGIN_NAME, 0, icon, PLUGIN_DESCRIPTION, HLAECamio2C4d())
 	
 	# Console confirmation
-	print ("Loaded HLAE CamIO 2 Cinema4D %s" % (PLUGIN_VERSION))
+	print ("Loaded HLAE CamIO 2 Cinema4D %s" % (PLUGIN_VERSION_STR))
 
 # Main Execution
 main()
